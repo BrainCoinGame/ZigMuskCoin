@@ -2,7 +2,6 @@
   <div class="game-container">
     <div class="top-bar">
       <div class="user-info">
-        <img :src="user.avatar" alt="Avatar" class="user-avatar" />
         <span class="user-name">{{ user.name }}</span>
       </div>
       <div class="game-stats">
@@ -82,8 +81,7 @@ export default {
   data() {
     return {
       user: {
-        name: 'Telegram User',
-        avatar: 'https://via.placeholder.com/50',
+        name: 'User',
       },
       points: 0,
       level: 1,
@@ -138,10 +136,12 @@ export default {
       this.isPressed = true;
       this.currentCoinImage = coinPushImage;
       this.processClick();
+      this.startAutoClick();
     },
     handleRelease() {
       this.isPressed = false;
       this.currentCoinImage = coinImage;
+      this.stopAutoClick();
     },
     calculateClickReward() {
       let baseReward = this.level;
@@ -223,21 +223,26 @@ export default {
         }
       }, 1000);
     },
+    startAutoClick() {
+      if (this.autoClickInterval) return;
+
+      this.autoClickInterval = setInterval(() => {
+        if (this.isPressed) {
+          this.processClick();
+        }
+      }, 100);
+    },
+    stopAutoClick() {
+      if (this.autoClickInterval) {
+        clearInterval(this.autoClickInterval);
+        this.autoClickInterval = null;
+      }
+    },
     handleMenuClick(button) {
       console.log('Menu button clicked:', button);
     },
-    initTelegramUser() {
-      if (window.Telegram && window.Telegram.WebApp) {
-        const user = window.Telegram.WebApp.initDataUnsafe.user;
-        if (user) {
-          this.user.name = user.first_name || 'Telegram User';
-          this.user.avatar = user.photo_url || 'https://via.placeholder.com/50';
-        }
-      }
-    },
   },
   mounted() {
-    this.initTelegramUser();
     this.updateEnergyGradient();
     this.updateLevelGradient();
     this.updateLevelProgress();
@@ -246,6 +251,9 @@ export default {
   beforeDestroy() {
     if (this.restoreInterval) {
       clearInterval(this.restoreInterval);
+    }
+    if (this.autoClickInterval) {
+      clearInterval(this.autoClickInterval);
     }
   },
 };
@@ -291,13 +299,6 @@ export default {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
 .user-name {
   font-size: 16px;
   font-weight: bold;
@@ -331,7 +332,7 @@ export default {
   justify-content: center;
   align-items: center;
   position: relative;
-  margin-top: 30px; /* Смещение монеты вниз на 30 пикселей */
+  margin-top: 160px;
 }
 
 .coin {
@@ -344,11 +345,7 @@ export default {
 .coin-image {
   width: 300px;
   height: 300px;
-  transition: transform 0.1s ease;
-}
-
-.coin:active .coin-image {
-  transform: scale(0.95);
+  /* Убрать transition для мгновенной смены изображения */
 }
 
 .menu {

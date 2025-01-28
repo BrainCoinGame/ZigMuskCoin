@@ -1,5 +1,36 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
+import { createApp, onMounted } from 'vue';
+import axios from 'axios';
+import App from './App.vue';
+import './style.css';
 
-createApp(App).mount('#app')
+const app = createApp(App);
+
+app.mixin({
+  mounted() {
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.expand(); // Развернуть приложение на весь экран
+
+      const user = tg.initDataUnsafe?.user;
+      if (user) {
+        axios.post('https://af9bb9b3.zigmuskcoin.pages.dev', {
+          telegram_id: user.id,
+          first_name: user.first_name,
+          last_name: user.last_name || '',
+          username: user.username || '',
+          photo_url: user.photo_url || '',
+        })
+        .then(response => {
+          console.log('User registered:', response.data);
+        })
+        .catch(error => {
+          console.error('Error registering user:', error);
+        });
+      } else {
+        console.error('Telegram user data not found');
+      }
+    }
+  }
+});
+
+app.mount('#app');
