@@ -28,7 +28,7 @@ app.mixin({
           console.error('Error registering user:', error);
         });
       } else {
-        console.error('Telegram user data not found');
+        console.error('MUSSSSSKKKK data not found');
       }
     }
   }
