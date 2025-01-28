@@ -14,7 +14,7 @@ app.mixin({
       const user = tg.initDataUnsafe?.user;
       if (user) {
         this.$root.user.name = user.first_name || 'User';
-        axios.post('https://af9bb9b3.zigmuskcoin.pages.dev', {
+        axios.post('https://ba88773b.zigmuskcoin.pages.dev', {
           telegram_id: user.id,
           first_name: user.first_name,
           last_name: user.last_name || '',
