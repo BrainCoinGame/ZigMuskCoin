@@ -1,35 +1,45 @@
-import { createApp, onMounted } from 'vue';
+import { createApp } from 'vue';
 import axios from 'axios';
 import App from './App.vue';
 import './style.css';
 
 const app = createApp(App);
 
-app.mixin({
-  mounted() {
-    if (window.Telegram && window.Telegram.WebApp) {
-      const tg = window.Telegram.WebApp;
-      tg.expand(); // Развернуть приложение на весь экран
+// Функция для регистрации пользователя
+async function registerUser(user) {
+  try {
+    const response = await axios.post('https://af9bb9b3.zigmuskcoin.pages.dev', {
+      telegram_id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name || '',
+      username: user.username || '',
+      photo_url: user.photo_url || '',
+    });
+    console.log('User registered:', response.data);
+  } catch (error) {
+    console.error('Error registering user:', error.response ? error.response.data : error.message);
+  }
+}
 
-      const user = tg.initDataUnsafe?.user;
-      if (user) {
-        this.$root.user.name = user.first_name || 'User';
-        axios.post('https://ba88773b.zigmuskcoin.pages.dev', {
-          telegram_id: user.id,
-          first_name: user.first_name,
-          last_name: user.last_name || '',
-          username: user.username || '',
-          photo_url: user.photo_url || '',
-        })
-        .then(response => {
-          console.log('User registered:', response.data);
-        })
-        .catch(error => {
-          console.error('Error registering user:', error);
-        });
+// Миксин для работы с Telegram WebApp
+app.mixin({
+  async mounted() {
+    try {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Развернуть приложение на весь экран
+
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+          await registerUser(user); // Регистрация пользователя
+        } else {
+          console.error('Telegram user data not found');
+        }
       } else {
-        console.error('MUSSSSSKKKK data not found');
+        console.error('Telegram WebApp not found');
       }
+    } catch (error) {
+      console.error('Error in Telegram WebApp integration:', error.message);
     }
   }
 });
