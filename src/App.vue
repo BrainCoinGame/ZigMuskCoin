@@ -3,13 +3,13 @@
     <div class="top-bar">
       <div class="user-info">
         <span class="user-name">{{ user.name }}</span>
+        <span class="user-level">Lvl: {{ level }}</span>
       </div>
       <div class="game-stats">
         <div class="score">
           <img :src="coinIconSrc" alt="Coin" class="coin-icon" />
           <span class="score-value">{{ formatNumber(points) }}</span>
         </div>
-        <div class="level">Lvl: {{ level }}</div>
         <div class="progress-bars">
           <div class="energy-container">
             <div class="energy-label">Energy</div>
@@ -294,12 +294,19 @@ export default {
 .user-info {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .user-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.user-level {
   font-size: 16px;
   font-weight: bold;
   color: #333;
