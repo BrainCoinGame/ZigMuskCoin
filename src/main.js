@@ -7,7 +7,7 @@ const app = createApp(App);
 
 async function registerUser(user) {
   try {
-    const response = await axios.post('https://a59a2b57.zigmuskcoin.pages.dev/', {
+    const response = await axios.post('https://479d4bd7.zigmuskcoin.pages.dev/', {
       telegram_id: user.id,
       first_name: user.first_name,
       last_name: user.last_name || '',

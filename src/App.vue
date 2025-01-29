@@ -78,7 +78,6 @@
         <img :src="button.icon" :alt="button.name" class="nav-icon" />
         <span class="nav-label">{{ button.name }}</span>
       </button>
-      <BoostShop />
     </div>
   </div>
 </template>
@@ -93,13 +92,9 @@ import trophyIcon from '@/assets/icons/trophy.png';
 import rankingIcon from '@/assets/icons/ranking.png';
 import helpIcon from '@/assets/icons/help.png';
 import bonusIcon from '@/assets/bonus.png';
-import BoostShop from './components/BoostShop.vue';
 
 export default {
   name: 'ZigMuskGame',
-  components: {
-    BoostShop,
-  },
   data() {
     return {
       telegramUser: null,
@@ -116,7 +111,7 @@ export default {
       bonusAmount: 0,
       currentCoinIcon: coinIcon,
       menuButtons: [
-        { icon: shopIcon, name: 'Boost', route: '/boost' }, // Добавлен route для Boost
+        { icon: shopIcon, name: 'Boost', route: '/boostshop' }, // Добавлен route для Boost
         { icon: settingsIcon, name: 'Settings' },
         { icon: trophyIcon, name: 'Trophy' },
         { icon: rankingIcon, name: 'Ranking' },
@@ -246,18 +241,17 @@ export default {
       this.activeBoosts = this.activeBoosts.filter(boost => boost.type !== boostType);
     },
     handleMenuClick(button) {
-  if (!button) {
-    console.error('Button is not defined');
-    return;
-  }
+      if (!button) {
+        console.error('Button is not defined');
+        return;
+      }
 
-  if (button.route) {
-    this.$router.push(button.route); // Переход на страницу, если указан route
-  } else if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.showAlert(`Opening ${button.name || 'unknown button'}...`);
-
-  }
-}
+      if (button.name === 'Boost') {
+        window.open('/boost', '_blank'); // Открываем BoostShop в новом окне
+      } else if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.showAlert(`Opening ${button.name || 'unknown button'}...`);
+      }
+    }
   },
   async mounted() {
     if (window.Telegram?.WebApp) {
