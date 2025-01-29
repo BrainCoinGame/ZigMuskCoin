@@ -65,7 +65,6 @@
     <div class="boost-menu">
       <button @click="activateBoost('clickBonus', 60000, 10)">Activate Click Boost</button>
       <button @click="activateBoost('energyRestore', 60000, 5)">Activate Energy Boost</button>
-      <button @click="activateBoost('multiplier', 60000, 2)">Activate Multiplier Boost</button>
     </div>
 
     <!-- Navigation Menu -->
@@ -353,7 +352,7 @@ export default {
   border-radius: 12px;
   padding: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  width: calc(100% - 8px);
+  width: calc(100% - 16px);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -488,7 +487,7 @@ export default {
   justify-content: space-around;
   flex-wrap: wrap;
   gap: 4px;
-  width: calc(100% - 1px);
+  width: calc(100% - 16px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
