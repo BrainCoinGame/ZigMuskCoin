@@ -79,6 +79,7 @@
         <img :src="button.icon" :alt="button.name" class="nav-icon" />
         <span class="nav-label">{{ button.name }}</span>
       </button>
+      <BoostShop />
     </div>
   </div>
 </template>
@@ -93,6 +94,7 @@ import trophyIcon from '@/assets/icons/trophy.png';
 import rankingIcon from '@/assets/icons/ranking.png';
 import helpIcon from '@/assets/icons/help.png';
 import bonusIcon from '@/assets/bonus.png';
+import BoostShop from './components/BoostShop.vue';
 
 export default {
   name: 'ZigMuskGame',
@@ -112,7 +114,7 @@ export default {
       bonusAmount: 0,
       currentCoinIcon: coinIcon,
       menuButtons: [
-        { icon: shopIcon, name: 'Shop' },
+        { icon: shopIcon, name: 'Boost' },
         { icon: settingsIcon, name: 'Settings' },
         { icon: trophyIcon, name: 'Trophy' },
         { icon: rankingIcon, name: 'Ranking' },
@@ -465,8 +467,8 @@ export default {
 }
 
 .game-coin {
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   pointer-events: none;
   transition: transform 0.2s;
   animation: pulse 2s infinite;
@@ -486,7 +488,7 @@ export default {
   justify-content: space-around;
   flex-wrap: wrap;
   gap: 4px;
-  width: calc(100% - 8px);
+  width: calc(100% - 1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -504,8 +506,8 @@ export default {
 }
 
 .nav-icon {
-  width: 24px;
-  height: 24px;
+  width: 34px;
+  height: 34px;
   transition: transform 0.1s;
 }
 
