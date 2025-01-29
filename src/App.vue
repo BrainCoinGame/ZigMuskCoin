@@ -97,6 +97,9 @@ import BoostShop from './components/BoostShop.vue';
 
 export default {
   name: 'ZigMuskGame',
+  components: {
+    BoostShop,
+  },
   data() {
     return {
       telegramUser: null,
@@ -113,7 +116,7 @@ export default {
       bonusAmount: 0,
       currentCoinIcon: coinIcon,
       menuButtons: [
-        { icon: shopIcon, name: 'Boost' },
+        { icon: shopIcon, name: 'Boost', route: '/boost' }, // Добавлен route для Boost
         { icon: settingsIcon, name: 'Settings' },
         { icon: trophyIcon, name: 'Trophy' },
         { icon: rankingIcon, name: 'Ranking' },
@@ -243,10 +246,18 @@ export default {
       this.activeBoosts = this.activeBoosts.filter(boost => boost.type !== boostType);
     },
     handleMenuClick(button) {
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.showAlert(`Opening ${button.name}...`);
-      }
-    }
+  if (!button) {
+    console.error('Button is not defined');
+    return;
+  }
+
+  if (button.route) {
+    this.$router.push(button.route); // Переход на страницу, если указан route
+  } else if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.showAlert(`Opening ${button.name || 'unknown button'}...`);
+
+  }
+}
   },
   async mounted() {
     if (window.Telegram?.WebApp) {
@@ -334,17 +345,17 @@ export default {
 }
 
 /* Остальные стили остаются без изменений */
-.game-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  max-width: 100%;
-  margin: 0 auto;
-  background: #f5f5f5;
-  padding: 4px;
-  gap: 12px;
-  box-sizing: border-box;
-  overflow: hidden;
+.game-container[data-v-7a7a37b1] {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    inset: 5px; /* Задает отступ 5px со всех сторон */
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+    gap: 10px;
+    box-sizing: border-box;
+    overflow: hidden; /* Убирает возможный скролл */
 }
 
 .stats-card {
@@ -466,8 +477,8 @@ export default {
 }
 
 .game-coin {
-  width: 300px;
-  height: 300px;
+  width: 400px;
+  height: 400px;
   pointer-events: none;
   transition: transform 0.2s;
   animation: pulse 2s infinite;
