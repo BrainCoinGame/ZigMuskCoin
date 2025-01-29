@@ -8,12 +8,10 @@
           <span class="score-text">{{ formatNumber(points) }}</span>
         </div>
         <button class="wallet-btn" @click="connectWallet">
-          Connect Wallet
+          Wallet 💲
         </button>
       </div>
 
-      <div class="level-text">Level: {{ level }}</div>
-      
       <div class="progress-container">
         <div class="progress-item">
           <span class="progress-label">Energy</span>
@@ -28,7 +26,7 @@
         </div>
 
         <div class="progress-item">
-          <span class="progress-label">Level Progress</span>
+          <span class="progress-label">Lvl</span>
           <div class="progress-track">
             <div 
               class="progress-bar level"
@@ -63,6 +61,13 @@
       </div>
     </div>
 
+    <!-- Boost Menu -->
+    <div class="boost-menu">
+      <button @click="activateBoost('clickBonus', 60000, 10)">Activate Click Boost</button>
+      <button @click="activateBoost('energyRestore', 60000, 5)">Activate Energy Boost</button>
+      <button @click="activateBoost('multiplier', 60000, 2)">Activate Multiplier Boost</button>
+    </div>
+
     <!-- Navigation Menu -->
     <div class="nav-menu">
       <button
@@ -82,7 +87,7 @@
 import axios from 'axios';
 import coinIcon from '@/assets/coin.png';
 import coinPushIcon from '@/assets/coin-push.png';
-import shopIcon from '@/assets/icons/shop.png';
+import shopIcon from '@/assets/icons/shop.gif';
 import settingsIcon from '@/assets/icons/settings.png';
 import trophyIcon from '@/assets/icons/trophy.png';
 import rankingIcon from '@/assets/icons/ranking.png';
@@ -94,8 +99,8 @@ export default {
   data() {
     return {
       telegramUser: null,
-      points: 41000,
-      level: 42,
+      points: 0,
+      level: 1,
       energy: 100,
       nextLevelProgress: 0,
       isPressed: false,
@@ -113,19 +118,13 @@ export default {
         { icon: rankingIcon, name: 'Ranking' },
         { icon: helpIcon, name: 'Help' }
       ],
-      gameState: {
-        baseClicks: 1000,
-        additionalEnergy: 0,
-        autoClicker: 0,
-        referrals: 0,
-        referralMultiplier: 1.5,
-        boosts: {
-          clickBonus: 0,
-          multiplier: 1,
-        },
-        fatigueLimit: 10,
+      boosts: {
+        clickBonus: 0, // Буст на увеличение награды за клик
+        energyRestore: 0, // Буст на ускорение восстановления энергии
+        multiplier: 1, // Множитель очков
       },
-      maxLevel: 50, // Максимальный уровень
+      activeBoosts: [], // Список активных бустов
+      maxLevel: 50,
     };
   },
   methods: {
@@ -170,7 +169,9 @@ export default {
       }
       if (this.energy > 0) {
         this.isPressed = true;
-        this.points += this.calculateClickReward();
+        const baseReward = this.calculateClickReward();
+        const boostedReward = baseReward * this.boosts.multiplier + this.boosts.clickBonus;
+        this.points += boostedReward;
         this.updateProgress();
         this.updateEnergy();
 
@@ -216,13 +217,29 @@ export default {
       if (!this.energyRestoreInterval) {
         this.energyRestoreInterval = setInterval(() => {
           if (this.energy < 100) {
-            this.energy = Math.min(100, this.energy + 5);
+            const restoreAmount = 5 + this.boosts.energyRestore; // Учитываем буст на восстановление энергии
+            this.energy = Math.min(100, this.energy + restoreAmount);
           } else {
             clearInterval(this.energyRestoreInterval);
             this.energyRestoreInterval = null;
           }
         }, 3000);
       }
+    },
+    activateBoost(boostType, duration, value) {
+      // Активируем буст
+      this.boosts[boostType] += value;
+      this.activeBoosts.push({ type: boostType, duration, value });
+
+      // Устанавливаем таймер для деактивации буста
+      setTimeout(() => {
+        this.deactivateBoost(boostType, value);
+      }, duration);
+    },
+    deactivateBoost(boostType, value) {
+      // Деактивируем буст
+      this.boosts[boostType] -= value;
+      this.activeBoosts = this.activeBoosts.filter(boost => boost.type !== boostType);
     },
     handleMenuClick(button) {
       if (window.Telegram?.WebApp) {
@@ -293,6 +310,28 @@ export default {
   100% { top: 70%; }
 }
 
+/* Стили для меню бустов */
+.boost-menu {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.boost-menu button {
+  background: #ffcc00;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.boost-menu button:active {
+  transform: scale(0.95);
+}
+
 /* Остальные стили остаются без изменений */
 .game-container {
   display: flex;
@@ -301,41 +340,44 @@ export default {
   max-width: 100%;
   margin: 0 auto;
   background: #f5f5f5;
-  padding: 12px;
+  padding: 4px;
   gap: 12px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .stats-card {
   background: white;
   border-radius: 12px;
-  padding: 16px;
+  padding: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  width: 100%;
+  width: calc(100% - 8px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .stats-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .score-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
 .coin-icon {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .score-text {
-  font-size: clamp(14px, 4vw, 18px);
+  font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -344,8 +386,8 @@ export default {
   background: #ffcc00;
   border: none;
   border-radius: 20px;
-  padding: 8px 16px;
-  font-size: clamp(12px, 3vw, 14px);
+  padding: 4px 15px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
@@ -356,37 +398,30 @@ export default {
   transform: scale(0.95);
 }
 
-.level-text {
-  font-size: clamp(12px, 3.5vw, 14px);
-  color: #666;
-  margin: 8px 0;
-  text-align: center;
-}
-
 .progress-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 2px;
+  align-items: flex-end;
 }
 
 .progress-item {
-  width: 100%;
+  width: 40%;
 }
 
 .progress-label {
   display: block;
-  font-size: clamp(10px, 3vw, 12px);
+  font-size: 10px;
   color: #666;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .progress-track {
   width: 100%;
-  height: 20px;
+  height: 4px;
   background: #eee;
-  border-radius: 10px;
+  border-radius: 5px;
   overflow: hidden;
-  position: relative;
 }
 
 .progress-bar {
@@ -395,17 +430,17 @@ export default {
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: clamp(10px, 3vw, 12px);
+  font-size: 0px;
   font-weight: 500;
   transition: width 0.3s ease;
 }
 
 .progress-bar.energy {
-  background: linear-gradient(90deg, #2ecc71, #27ae60);
+  background: linear-gradient(90deg, #ff0000, #e5ff00);
 }
 
 .progress-bar.level {
-  background: linear-gradient(90deg, #e0e0e0, #b0b0b0);
+  background: linear-gradient(90deg, #1300b9, #0c9200);
 }
 
 .game-area {
@@ -430,8 +465,8 @@ export default {
 }
 
 .game-coin {
-  width: 340px;
-  height: 340px;
+  width: 200px;
+  height: 200px;
   pointer-events: none;
   transition: transform 0.2s;
   animation: pulse 2s infinite;
@@ -446,12 +481,12 @@ export default {
 .nav-menu {
   background: white;
   border-radius: 12px;
-  padding: 12px;
+  padding: 8px;
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  gap: 8px;
-  width: 100%;
+  gap: 4px;
+  width: calc(100% - 8px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -459,18 +494,18 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   background: none;
   border: none;
-  padding: 8px;
+  padding: 4px;
   cursor: pointer;
   flex: 1 1 60px;
   min-width: 60px;
 }
 
 .nav-icon {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   transition: transform 0.1s;
 }
 
@@ -479,7 +514,7 @@ export default {
 }
 
 .nav-label {
-  font-size: clamp(8px, 2.5vw, 10px);
+  font-size: 10px;
   color: #666;
   text-align: center;
   line-height: 1.2;
@@ -492,16 +527,16 @@ export default {
   }
 
   .stats-card {
-    padding: 12px;
+    padding: 6px;
   }
 
   .game-coin {
-    width: 200px;
-    height: 200px;
+    width: 350px;
+    height: 350px;
   }
 
   .nav-menu {
-    padding: 8px;
+    padding: 6px;
   }
 }
 
@@ -515,7 +550,6 @@ export default {
     background: #2a2a2a;
   }
 
-  .level-text,
   .progress-label,
   .nav-label {
     color: #ccc;
