@@ -1,9 +1,3 @@
 name = "zigmuskcoin"
-type = "javascript"
-
-account_id = "53933bc014d6bc0c2e02ab5b76a97e93"
-workers_dev = true
-compatibility_date = "2025-01-01"
-
-[env.production]
-name = "zigmuskcoin-prod"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-05-01"

@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build --emptyOutDir",
-    "preview": "vite preview --host",
-    "preview:prod": "serve dist -p 4173"
+    "dev": "vite --host localhost --port 5173 --strict-port",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "start": "node server.js"
   },
   "dependencies": {
     "@tonconnect/ui": "^2.0.11",
@@ -17,11 +17,12 @@
   },
   "devDependencies": {
     "@vitejs/plugin-basic-ssl": "^1.0.4",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "vite": "^6.0.11",
+    "@vitejs/plugin-vue": "^5.2.1", 
+    "vite": "^5.0.0", 
+    "vite-plugin-node-polyfills": "^0.23.0",
     "serve": "^14.2.1"
   },
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "npm@9.0.0", 
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BrainCoinGame/ZigMuskCoin.git"
@@ -32,5 +33,7 @@
   "bugs": {
     "url": "https://github.com/BrainCoinGame/ZigMuskCoin/issues"
   },
-  "homepage": "https://github.com/BrainCoinGame/ZigMuskCoin#readme"
+  "homepage": "https://github.com/BrainCoinGame/ZigMuskCoin#readme",
+  "description": "This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.",
+  "main": "server.js"
 }

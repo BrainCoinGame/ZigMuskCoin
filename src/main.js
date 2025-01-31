@@ -1,3 +1,5 @@
+import './polyfills'
+// Остальные импорты после полифилов
 import { createApp } from 'vue';
 import axios from 'axios';
 import App from './App.vue';
