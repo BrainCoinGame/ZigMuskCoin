@@ -296,18 +296,17 @@ export default {
 </script>
 
 <style scoped>
-/* Все стили остаются без изменений */
-.game-container[data-v-7a7a37b1] {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    inset: 5px;
-    margin: 0;
-    padding: 0;
-    background: #f5f5f5;
-    gap: 10px;
-    box-sizing: border-box;
-    overflow: hidden;
+.game-container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  inset: 5px;
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+  gap: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .stats-card {
@@ -347,13 +346,13 @@ export default {
 }
 
 .connect-button {
-  background: #4CAF50; /* Зеленый цвет для кнопки Connect Wallet */
+  background: #4CAF50;
   border: none;
   border-radius: 20px;
   padding: 4px 15px;
   font-size: 12px;
   font-weight: 500;
-  color: white; /* Белый текст */
+  color: white;
   cursor: pointer;
   white-space: nowrap;
   transition: transform 0.1s;
@@ -443,6 +442,41 @@ export default {
   100% { transform: scale(1); }
 }
 
+.bonus-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: float 1.5s ease-in-out;
+}
+
+.bonus-icon {
+  width: 60px; /* Уменьшенный размер иконки бонуса */
+  height: 60px;
+  animation: bounce 0.5s ease-in-out;
+}
+
+.bonus-text {
+  font-size: 16px; /* Уменьшенный размер текста */
+  font-weight: bold;
+  color: #4CAF50;
+  margin-top: 8px;
+}
+
+@keyframes float {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
 .nav-menu {
   background: white;
   border-radius: 12px;
@@ -503,6 +537,15 @@ export default {
   .nav-menu {
     padding: 6px;
   }
+
+  .bonus-icon {
+    width: 50px; /* Еще меньше на мобильных устройствах */
+    height: 50px;
+  }
+
+  .bonus-text {
+    font-size: 14px; /* Еще меньше на мобильных устройствах */
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -529,7 +572,7 @@ export default {
   }
 
   .connect-button {
-    background: #4CAF50; /* Зеленый цвет для кнопки Connect Wallet в темной теме */
+    background: #4CAF50;
   }
 }
 </style>

@@ -1,53 +1,44 @@
 <template>
-  <div class="boost-item">
-    <h3>{{ boost.type }}</h3>
-    <p>Эффект: {{ boost.effect }}</p>
-    <p>Длительность: {{ boost.duration }}</p>
-    <p>Цена (временный): {{ boost.priceTemporary }} монет</p>
-    <p>Цена (постоянный): {{ boost.pricePermanent }} монет</p>
-    <button @click="buyTemporary">Купить временный</button>
-    <button @click="buyPermanent">Купить постоянный</button>
+  <div>
+    <BoostItem
+      v-for="(boost, index) in boosts"
+      :key="index"
+      :boost="boost"
+      @buy="handleBuy"
+    />
   </div>
 </template>
 
 <script>
+import BoostItem from '@/components/BoostItem.vue';
+
 export default {
-  props: {
-    boost: {
-      type: Object,
-      required: true,
-    },
+  components: {
+    BoostItem,
+  },
+  data() {
+    return {
+      boosts: [
+        {
+          type: 'Ускорение',
+          effect: 'Увеличивает скорость на 20%',
+          duration: '1 час',
+          priceTemporary: 50,
+          pricePermanent: 200,
+        },
+        // Добавьте другие бусты
+      ],
+    };
   },
   methods: {
-    buyTemporary() {
-      this.$emit('buy', this.boost, false);
-    },
-    buyPermanent() {
-      this.$emit('buy', this.boost, true);
+    handleBuy(boost, isPermanent) {
+      // Обрабатываем покупку буста
+      if (isPermanent) {
+        console.log('Куплен постоянный буст:', boost);
+      } else {
+        console.log('Куплен временный буст:', boost);
+      }
     },
   },
 };
 </script>
-
-<style>
-.boost-item {
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #f9f9f9;
-}
-
-button {
-  margin: 5px;
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-</style>
