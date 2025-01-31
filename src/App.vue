@@ -56,6 +56,10 @@
         @touchcancel.prevent="handleRelease"
       >
         <img :src="currentCoinIcon" alt="Game Coin" class="game-coin" />
+        <!-- Отображение значения за клик -->
+        <div v-if="showClickValue" class="click-value">
+          +{{ clickValue }}
+        </div>
       </div>
 
       <!-- Bonus Popup -->
@@ -141,7 +145,9 @@ export default {
       activeBoosts: [],
       maxLevel: 50,
       showWalletModal: false,
-      showPurchaseModal: false
+      showPurchaseModal: false,
+      showClickValue: false,
+      clickValue: 0
     };
   },
   methods: {
@@ -170,16 +176,21 @@ export default {
       return new Intl.NumberFormat().format(num);
     },
     calculateClickReward() {
-      const i = Math.floor((this.level - 1) / 5);
-      const min = 5 + 5 * i;
-      const max = 20 + Math.floor((980 * i) / 9);
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+      return this.level;
     },
     calculateBonus() {
-      const i = Math.floor((this.level - 1) / 5);
-      const min = 5 + 5 * i;
-      const max = 20 + Math.floor((980 * i) / 9);
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+      if (this.level >= 1 && this.level <= 10) {
+        return Math.floor(Math.random() * 6) + 5;
+      } else if (this.level >= 11 && this.level <= 20) {
+        return Math.floor(Math.random() * 16) + 10;
+      } else if (this.level >= 21 && this.level <= 30) {
+        return Math.floor(Math.random() * 76) + 25;
+      } else if (this.level >= 31 && this.level <= 40) {
+        return Math.floor(Math.random() * 401) + 100;
+      } else if (this.level >= 41 && this.level <= 50) {
+        return Math.floor(Math.random() * 9501) + 500;
+      }
+      return 0;
     },
     handlePress(event) {
       if (event) {
@@ -190,6 +201,8 @@ export default {
         const baseReward = this.calculateClickReward();
         const boostedReward = baseReward * this.boosts.multiplier + this.boosts.clickBonus;
         this.points += boostedReward;
+        this.clickValue = boostedReward;
+        this.showClickValue = true;
         this.updateProgress();
         this.updateEnergy();
 
@@ -204,6 +217,10 @@ export default {
             this.currentCoinIcon = this.coinIcon;
           }, 2000);
         }
+
+        setTimeout(() => {
+          this.showClickValue = false;
+        }, 1000);
       }
     },
     handleRelease(event) {
@@ -420,6 +437,7 @@ export default {
   user-select: none;
   transition: all 0.15s cubic-bezier(0.18, 0.89, 0.32, 1.28);
   transform-origin: center;
+  position: relative;
 }
 
 .click-area.pressed {
@@ -454,16 +472,27 @@ export default {
 }
 
 .bonus-icon {
-  width: 60px; /* Уменьшенный размер иконки бонуса */
-  height: 60px;
+  width: 96px; /* Увеличен на 60% */
+  height: 96px;
   animation: bounce 0.5s ease-in-out;
 }
 
 .bonus-text {
-  font-size: 16px; /* Уменьшенный размер текста */
+  font-size: 24px; /* Увеличенный шрифт */
   font-weight: bold;
   color: #4CAF50;
   margin-top: 8px;
+}
+
+.click-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: bold;
+  color: #4CAF50;
+  animation: float 1s ease-in-out;
 }
 
 @keyframes float {
@@ -539,12 +568,12 @@ export default {
   }
 
   .bonus-icon {
-    width: 50px; /* Еще меньше на мобильных устройствах */
-    height: 50px;
+    width: 76px; /* Увеличен на 60% */
+    height: 76px;
   }
 
   .bonus-text {
-    font-size: 14px; /* Еще меньше на мобильных устройствах */
+    font-size: 20px; /* Увеличенный шрифт */
   }
 }
 
