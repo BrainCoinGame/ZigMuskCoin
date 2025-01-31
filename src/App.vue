@@ -7,8 +7,12 @@
           <img :src="currentCoinIcon" alt="Coin" class="coin-icon" />
           <span class="score-text">{{ formatNumber(points) }}</span>
         </div>
-        <button class="wallet-btn" @click="connectWallet">
-          Wallet 💲
+        <!-- Кнопка Connect Wallet в левом верхнем углу -->
+        <button 
+          class="connect-button"
+          @click="toggleWalletModal"
+        >
+          Connect Wallet
         </button>
       </div>
 
@@ -79,6 +83,10 @@
         <span class="nav-label">{{ button.name }}</span>
       </button>
     </div>
+
+    <!-- Wallet Modal -->
+    <WalletConnect v-if="showWalletModal" @close="toggleWalletModal" />
+    <PurchaseModal v-if="showPurchaseModal" :show="showPurchaseModal" @close="togglePurchaseModal" />
   </div>
 </template>
 
@@ -92,9 +100,17 @@ import trophyIcon from '@/assets/icons/trophy.png';
 import rankingIcon from '@/assets/icons/ranking.png';
 import helpIcon from '@/assets/icons/help.png';
 import bonusIcon from '@/assets/bonus.png';
+import WalletConnect from '@/components/WalletConnect.vue';
+import Wallet from '@/components/Wallet.vue';
+import PurchaseModal from '@/components/PurchaseModal.vue';
 
 export default {
   name: 'ZigMuskGame',
+  components: {
+    WalletConnect,
+    Wallet,
+    PurchaseModal
+  },
   data() {
     return {
       telegramUser: null,
@@ -111,19 +127,21 @@ export default {
       bonusAmount: 0,
       currentCoinIcon: coinIcon,
       menuButtons: [
-        { icon: shopIcon, name: 'Boost', route: '/boostshop' }, // Добавлен route для Boost
+        { icon: shopIcon, name: 'Boost', route: '/boostshop' },
         { icon: settingsIcon, name: 'Settings' },
         { icon: trophyIcon, name: 'Trophy' },
         { icon: rankingIcon, name: 'Ranking' },
         { icon: helpIcon, name: 'Help' }
       ],
       boosts: {
-        clickBonus: 0, // Буст на увеличение награды за клик
-        energyRestore: 0, // Буст на ускорение восстановления энергии
-        multiplier: 1, // Множитель очков
+        clickBonus: 0,
+        energyRestore: 0,
+        multiplier: 1,
       },
-      activeBoosts: [], // Список активных бустов
+      activeBoosts: [],
       maxLevel: 50,
+      showWalletModal: false,
+      showPurchaseModal: false
     };
   },
   methods: {
@@ -142,10 +160,11 @@ export default {
         throw error;
       }
     },
-    connectWallet() {
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.showAlert('Connecting wallet...');
-      }
+    toggleWalletModal() {
+      this.showWalletModal = !this.showWalletModal;
+    },
+    togglePurchaseModal() {
+      this.showPurchaseModal = !this.showPurchaseModal;
     },
     formatNumber(num) {
       return new Intl.NumberFormat().format(num);
@@ -174,8 +193,7 @@ export default {
         this.updateProgress();
         this.updateEnergy();
 
-        // Случайное выпадение бонуса
-        if (Math.random() < 0.01) { // 1% шанс выпадения бонуса
+        if (Math.random() < 0.01) {
           this.showBonus = true;
           this.bonusAmount = this.calculateBonus();
           this.points += this.bonusAmount;
@@ -184,7 +202,7 @@ export default {
           setTimeout(() => {
             this.showBonus = false;
             this.currentCoinIcon = this.coinIcon;
-          }, 2000); // Бонус исчезает через 2 секунды
+          }, 2000);
         }
       }
     },
@@ -202,7 +220,7 @@ export default {
         this.level += 1;
         this.nextLevelProgress = 0;
       } else if (this.level >= this.maxLevel) {
-        this.nextLevelProgress = 100; // Прогресс на максимуме, если достигнут максимальный уровень
+        this.nextLevelProgress = 100;
       }
     },
     updateEnergy() {
@@ -216,7 +234,7 @@ export default {
       if (!this.energyRestoreInterval) {
         this.energyRestoreInterval = setInterval(() => {
           if (this.energy < 100) {
-            const restoreAmount = 5 + this.boosts.energyRestore; // Учитываем буст на восстановление энергии
+            const restoreAmount = 5 + this.boosts.energyRestore;
             this.energy = Math.min(100, this.energy + restoreAmount);
           } else {
             clearInterval(this.energyRestoreInterval);
@@ -226,17 +244,14 @@ export default {
       }
     },
     activateBoost(boostType, duration, value) {
-      // Активируем буст
       this.boosts[boostType] += value;
       this.activeBoosts.push({ type: boostType, duration, value });
 
-      // Устанавливаем таймер для деактивации буста
       setTimeout(() => {
         this.deactivateBoost(boostType, value);
       }, duration);
     },
     deactivateBoost(boostType, value) {
-      // Деактивируем буст
       this.boosts[boostType] -= value;
       this.activeBoosts = this.activeBoosts.filter(boost => boost.type !== boostType);
     },
@@ -247,7 +262,7 @@ export default {
       }
 
       if (button.name === 'Boost') {
-        window.open('/boost', '_blank'); // Открываем BoostShop в новом окне
+        window.open('/boost', '_blank');
       } else if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.showAlert(`Opening ${button.name || 'unknown button'}...`);
       }
@@ -281,75 +296,18 @@ export default {
 </script>
 
 <style scoped>
-/* Добавляем стили для бонуса */
-.bonus-popup {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: float 2s ease-in-out, moveDown 2s ease-in-out;
-}
-
-.bonus-icon {
-  width: 100px;
-  height: 100px;
-}
-
-.bonus-text {
-  font-size: 24px;
-  font-weight: bold;
-  color: #ffcc00;
-  margin-top: 8px;
-}
-
-@keyframes float {
-  0% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.2); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-@keyframes moveDown {
-  0% { top: 50%; }
-  100% { top: 70%; }
-}
-
-/* Стили для меню бустов */
-.boost-menu {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 10px;
-}
-
-.boost-menu button {
-  background: #ffcc00;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.1s;
-}
-
-.boost-menu button:active {
-  transform: scale(0.95);
-}
-
-/* Остальные стили остаются без изменений */
+/* Все стили остаются без изменений */
 .game-container[data-v-7a7a37b1] {
     display: flex;
     flex-direction: column;
     position: absolute;
-    inset: 5px; /* Задает отступ 5px со всех сторон */
+    inset: 5px;
     margin: 0;
     padding: 0;
     background: #f5f5f5;
     gap: 10px;
     box-sizing: border-box;
-    overflow: hidden; /* Убирает возможный скролл */
+    overflow: hidden;
 }
 
 .stats-card {
@@ -388,19 +346,20 @@ export default {
   white-space: nowrap;
 }
 
-.wallet-btn {
-  background: #ffcc00;
+.connect-button {
+  background: #4CAF50; /* Зеленый цвет для кнопки Connect Wallet */
   border: none;
   border-radius: 20px;
   padding: 4px 15px;
   font-size: 12px;
   font-weight: 500;
+  color: white; /* Белый текст */
   cursor: pointer;
   white-space: nowrap;
   transition: transform 0.1s;
 }
 
-.wallet-btn:active {
+.connect-button:active {
   transform: scale(0.95);
 }
 
@@ -569,8 +528,8 @@ export default {
     background: linear-gradient(90deg, #666, #4d4d4d);
   }
 
-  .wallet-btn {
-    background: #ffd633;
+  .connect-button {
+    background: #4CAF50; /* Зеленый цвет для кнопки Connect Wallet в темной теме */
   }
 }
 </style>

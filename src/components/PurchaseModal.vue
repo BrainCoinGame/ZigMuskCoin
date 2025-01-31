@@ -1,69 +1,45 @@
 <template>
-  <div class="modal-overlay" v-if="show">
-    <div class="modal-content">
-      <h3>Купить NFT растения</h3>
-      <p>Цена: {{ price }}</p>
-      <button @click="handlePurchase">Подтвердить</button>
-      <button @click="$emit('close')">Отмена</button>
-      <p v-if="error" class="error">{{ error }}</p>
+  <div class="purchase-modal-overlay" v-if="show">
+    <div class="purchase-modal">
+      <!-- Ваш контент модального окна -->
+      <slot></slot>
+      <button @click="$emit('close')">Close</button>
     </div>
   </div>
 </template>
 
 <script>
-import { Address, beginCell, TonClient, toNano } from '@ton/core'; // Обновленный импорт
-
 export default {
   props: {
-    show: Boolean,
-    price: String,
-    plantId: Number,
-    buyerAddress: String,
-  },
-  data() {
-    return {
-      error: null,
-    };
-  },
-  methods: {
-    async handlePurchase() {
-      try {
-        if (!this.buyerAddress) {
-          throw new Error('Кошелек не подключен');
-        }
-        await this.purchaseNFT(this.plantId, this.buyerAddress);
-        this.$emit('success');
-      } catch (err) {
-        this.error = err.message;
-      }
-    },
-
-    async purchaseNFT(plantId, buyerAddress) {
-      const CONTRACT_ADDRESS = 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM';
-      const OPCODE_PURCHASE = 0x12345678;
-
-      const client = new TonClient({
-        endpoint: 'https://toncenter.com/api/v2/jsonRPC',
-      });
-
-      const body = beginCell()
-        .storeUint(OPCODE_PURCHASE, 32)
-        .storeUint(plantId, 64)
-        .endCell();
-
-      await client.sendExternalMessage({
-        address: Address.parse(CONTRACT_ADDRESS),
-        body: body,
-        amount: toNano(this.price.replace(' TON', '')),
-      });
-    },
-  },
+    show: {
+      type: Boolean,
+      required: true
+    }
+  }
 };
 </script>
 
 <style scoped>
-.error {
-  color: red;
-  margin-top: 10px;
+.purchase-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.purchase-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 90%;
+  width: 400px;
+  text-align: center;
 }
 </style>

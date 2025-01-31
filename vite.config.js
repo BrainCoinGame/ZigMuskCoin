@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import { nodePolyfills } from 'vite-plugin-node-polyfills'; // Добавляем плагин для полифилов
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    nodePolyfills(), // Подключаем плагин для полифилов
+  ],
   resolve: {
     alias: {
       '@': '/src', // Упрощение импортов
@@ -14,5 +18,8 @@ export default defineConfig({
     cors: true, // Включает CORS (если нужно)
     strictPort: true, // Гарантирует, что будет именно 5173
     hmr: true, // Автообновление через WebSockets
+  },
+  define: {
+    'process.env': {}, // Добавляем пустой объект для process.env, если он используется
   },
 });

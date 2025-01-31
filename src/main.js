@@ -2,8 +2,24 @@ import { createApp } from 'vue';
 import axios from 'axios';
 import App from './App.vue';
 import './style.css';
+import { Buffer } from 'buffer'; // Импортируем Buffer
+
+// Добавляем Buffer в глобальный объект window
+if (typeof window !== 'undefined') {
+  window.Buffer = Buffer;
+}
+
+// Импортируем компоненты
+import WalletConnect from '@/components/WalletConnect.vue';
+import Wallet from '@/components/Wallet.vue';
+import PurchaseModal from '@/components/PurchaseModal.vue';
 
 const app = createApp(App);
+
+// Регистрируем компоненты глобально
+app.component('WalletConnect', WalletConnect);
+app.component('Wallet', Wallet);
+app.component('PurchaseModal', PurchaseModal);
 
 async function registerUser(user) {
   try {
