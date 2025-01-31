@@ -176,21 +176,16 @@ export default {
       return new Intl.NumberFormat().format(num);
     },
     calculateClickReward() {
-      return this.level;
+      const i = Math.floor((this.level - 1) / 5);
+      const min = 5 + 5 * i;
+      const max = 20 + Math.floor((980 * i) / 9);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     },
     calculateBonus() {
-      if (this.level >= 1 && this.level <= 10) {
-        return Math.floor(Math.random() * 6) + 5;
-      } else if (this.level >= 11 && this.level <= 20) {
-        return Math.floor(Math.random() * 16) + 10;
-      } else if (this.level >= 21 && this.level <= 30) {
-        return Math.floor(Math.random() * 76) + 25;
-      } else if (this.level >= 31 && this.level <= 40) {
-        return Math.floor(Math.random() * 401) + 100;
-      } else if (this.level >= 41 && this.level <= 50) {
-        return Math.floor(Math.random() * 9501) + 500;
-      }
-      return 0;
+      const i = Math.floor((this.level - 1) / 5);
+      const min = 5 + 5 * i;
+      const max = 20 + Math.floor((980 * i) / 9);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     },
     handlePress(event) {
       if (event) {
