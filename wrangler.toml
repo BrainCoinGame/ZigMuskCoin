@@ -2,3 +2,6 @@ name = "my-worker"
 type = "javascript"
 account_id = "53933bc014d6bc0c2e02ab5b76a97e93"
 workers_dev = true
+
+[pages_build_output_dir]
+path = "dist"  # Укажите путь к папке с билдом
